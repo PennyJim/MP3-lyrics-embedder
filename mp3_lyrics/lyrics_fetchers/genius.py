@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 import urllib.parse as parse
 
 access_token = os.environ['GENIUS_ACCESS_TOKEN']
@@ -38,18 +39,22 @@ def normalize_text(input):
             input = input.replace(pair[0], pair[1])
     return input
 
+def split_artists(artists):
+    return re.split('; |, | & | feat. | ft. | / ', artists)
 
-def does_song_match(artist, title, song):
-    artist = normalize_text(artist)
+def does_song_match(artists, title, song):
+    artists = normalize_text(artists)
+    artists = split_artists(artists)
     title = normalize_text(title)
 
     possible_title = normalize_text(song['title'])
     primary_artist = normalize_text(song['primary_artist']['name'])
 
-    return title == possible_title and primary_artist == artist
+    return title == possible_title and primary_artist in artists
 
-def get_url(artist, song):
-    query = search_string(artist, song)
+def get_url(artists, song):
+    artist_array = split_artists(artists)
+    query = search_string(artist_array[0], song)
     result = search_genius(query)
     
     if result['meta']['status'] == 200:
@@ -58,7 +63,7 @@ def get_url(artist, song):
         raise Exception("No response from Genius API")
 
     for response in responses:
-        if does_song_match(artist, song, response['result']):
+        if does_song_match(artists, song, response['result']):
             return get_url_from_search(response)
     
     raise Exception("Song not found in Search for '"+query+"'")

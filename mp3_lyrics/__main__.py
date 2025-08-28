@@ -44,7 +44,7 @@ else:
 directory = OUT_DIRECTORY
 mp3_files = os_tools.find_mp3_files(directory, IS_RECURSIVE)
 
-for mp3_file in alive_it(mp3_files):
+for mp3_file in alive_it(mp3_files, spinner="notes", bar="filling"):
     if id3_tools.is_lyrics_tag_present(mp3_file):
         # print(mp3_file + " already has lyrics... Skipping.")
         continue

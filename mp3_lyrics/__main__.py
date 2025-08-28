@@ -3,7 +3,7 @@ from lyrics_fetchers import genius
 import os_tools
 
 from argparse import ArgumentParser
-from progress.bar import Bar
+from alive_progress import alive_it;
 
 parser = ArgumentParser()
 parser.add_argument("-i", "--input", dest="inputdir", required=True,
@@ -44,12 +44,7 @@ else:
 directory = OUT_DIRECTORY
 mp3_files = os_tools.find_mp3_files(directory, IS_RECURSIVE)
 
-if SHOW_PROGRESS:
-    bar = Bar('Progress', max=len(mp3_files))
-
-for mp3_file in mp3_files:
-    if SHOW_PROGRESS:
-        bar.next()
+for mp3_file in alive_it(mp3_files):
     if id3_tools.is_lyrics_tag_present(mp3_file):
         # This file already has embedded lyrics. Skipping the file.
         continue
@@ -63,6 +58,3 @@ for mp3_file in mp3_files:
         continue
 
     id3_tools.embed_lyrics(mp3_file, lyrics)
-
-if SHOW_PROGRESS:    
-    bar.finish()

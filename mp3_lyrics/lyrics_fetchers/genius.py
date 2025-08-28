@@ -73,4 +73,4 @@ def get_lyrics(song_details):
 
     lyrics = extract_lyrics(html_response.text)
 
-    return lyrics
+    return lyrics, song_url

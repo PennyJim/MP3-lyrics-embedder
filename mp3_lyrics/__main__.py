@@ -24,7 +24,7 @@ parser.add_argument("-l", "--log", dest="logfile",
 
 args = parser.parse_args()
 
-SHOW_PROGRESS      = not args.verbose
+VERBOSE            = args.verbose
 LOG_FILE           = args.logfile
 OVERWRITE_ORIGINAL = args.overwrite
 # WEBSITE            = args.website
@@ -52,7 +52,9 @@ for mp3_file in alive_it(mp3_files):
     band_name, song_name = id3_tools.get_song_details(mp3_file)
 
     try:
-        lyrics = genius.get_lyrics({"artist":band_name, "title":song_name})
+        lyrics, url = genius.get_lyrics({"artist":band_name, "title":song_name})
+        if VERBOSE:
+            print("Found lyrics at " + url)
     except Exception as e:
         # Error while downloading. Skipping this song.
         print("Unable to fetch lyrics for " + mp3_file)

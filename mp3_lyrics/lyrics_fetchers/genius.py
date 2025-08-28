@@ -67,6 +67,10 @@ def get_lyrics(song_details):
     artist = song_details['artist']
     song = song_details['title']
 
+    if "(instrumental)" in song.lower():
+        raise Exception("Song is named instrumental.. Skipping")
+
+
     song_url = get_url(artist, song)
     html_response = requests.get(song_url)
     # html_doc = web_tools.get_webpage(song_url)

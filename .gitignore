@@ -1,3 +1,5 @@
 todo
 sample
 *.pyc
+.vscode
+test/*.mp3

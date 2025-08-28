@@ -24,12 +24,27 @@ def get_artist_from_search(response):
 def get_url_from_search(response):
     return response['result']['url']
 
-def does_song_match(artist, title, song):
-    artist = artist.lower()
-    title = title.lower()
+character_replacements = [
+    ["’", "'"],
+    ["…", "..."],
+    
+    # Formatting characters, delete:
+    ["​", ""],
+]
+def normalize_text(input):
+    input = input.lower()
+    for pair in character_replacements:
+        if pair[0] in input:
+            input = input.replace(pair[0], pair[1])
+    return input
 
-    possible_title = song['title'].lower()
-    primary_artist = song['primary_artist']['name'].lower()
+
+def does_song_match(artist, title, song):
+    artist = normalize_text(artist)
+    title = normalize_text(title)
+
+    possible_title = normalize_text(song['title'])
+    primary_artist = normalize_text(song['primary_artist']['name'])
 
     return title == possible_title and primary_artist == artist
 

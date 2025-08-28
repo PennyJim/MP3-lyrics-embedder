@@ -46,15 +46,17 @@ mp3_files = os_tools.find_mp3_files(directory, IS_RECURSIVE)
 
 for mp3_file in alive_it(mp3_files):
     if id3_tools.is_lyrics_tag_present(mp3_file):
-        # This file already has embedded lyrics. Skipping the file.
+        # print(mp3_file + " already has lyrics... Skipping.")
         continue
 
     band_name, song_name = id3_tools.get_song_details(mp3_file)
 
     try:
         lyrics = genius.get_lyrics({"artist":band_name, "title":song_name})
-    except:
+    except Exception as e:
         # Error while downloading. Skipping this song.
+        print("Unable to fetch lyrics for " + mp3_file)
+        print("   \t" + str(e))
         continue
 
     id3_tools.embed_lyrics(mp3_file, lyrics)

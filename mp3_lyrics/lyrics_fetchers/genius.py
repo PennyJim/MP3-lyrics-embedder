@@ -50,6 +50,8 @@ def does_song_match(artists, title, song):
     possible_title = normalize_text(song['title'])
     primary_artist = normalize_text(song['primary_artist']['name'])
 
+    # TODO: get some user input when this *almost* matches
+    # Running in the debugger and having a conditional breakpoint on this let me forcibly pass multiple
     return title == possible_title and primary_artist in artists
 
 def get_url(artists, song):

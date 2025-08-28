@@ -1,12 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
-import os
+import urllib.parse as parse
 
 access_token = os.environ['GENIUS_ACCESS_TOKEN']
 url = "https://api.genius.com/"
 
-def search_genius(artist, song):
-    endpoint = "search?q="+artist+" "+song
+def search_string(artist, song):
+    return parse.quote_plus(artist+" "+song)
+
+def search_genius(query):
+    endpoint = "search?q="+query
     result = requests.get(url+endpoint, headers={'Authorization': 'Bearer '+access_token})
 
     result = result.json()
@@ -22,7 +25,8 @@ def get_url_from_search(response):
     return response['result']['url']
 
 def get_url(artist, song):
-    result = search_genius(artist, song)
+    query = search_string(artist, song)
+    result = search_genius(query)
     
     if result['meta']['status'] == 200:
         responses = result['response']['hits']
@@ -33,7 +37,7 @@ def get_url(artist, song):
         if get_song_from_search(response) == song.lower() and get_artist_from_search(response) == artist.lower():
             return get_url_from_search(response)
     
-    raise Exception("Song not found in Search Result")
+    raise Exception("Song not found in Search for '"+query+"'")
 
 def handle_element(element):
     if isinstance(element, str):

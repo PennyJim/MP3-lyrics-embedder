@@ -1,5 +1,5 @@
 import id3_tools
-from lyrics_fetchers import azlyrics
+from lyrics_fetchers import genius
 import os_tools
 
 from argparse import ArgumentParser
@@ -11,8 +11,8 @@ parser.add_argument("-i", "--input", dest="inputdir", required=True,
 parser.add_argument("-r", "--recursive",
                     action="store_true", dest="recursive", default=False,
                     help="Whether it should recursively check in directories for more mp3 files")
-parser.add_argument("--website", dest="website", default="auto",
-                    help="use specific website (azlyrics, genius, darklyrics)", metavar="WEBSITE")
+# parser.add_argument("--website", dest="website", default="auto",
+#                     help="use specific website (azlyrics, genius, darklyrics)", metavar="WEBSITE")
 parser.add_argument("--overwrite",
                     action="store_true", dest="overwrite", default=False,
                     help="operate on the input folder itself. The default behaviour is making a duplicate folder and leaving the original intact.")
@@ -27,7 +27,7 @@ args = parser.parse_args()
 SHOW_PROGRESS      = not args.verbose
 LOG_FILE           = args.logfile
 OVERWRITE_ORIGINAL = args.overwrite
-WEBSITE            = args.website
+# WEBSITE            = args.website
 IN_DIRECTORY       = args.inputdir
 IS_RECURSIVE       = args.recursive
 
@@ -57,7 +57,7 @@ for mp3_file in mp3_files:
     band_name, song_name = id3_tools.get_song_details(mp3_file)
 
     try:
-        lyrics = azlyrics.get_lyrics(band_name, song_name)
+        lyrics = genius.get_lyrics({"artist":band_name, "title":song_name})
     except:
         # Error while downloading. Skipping this song.
         continue

@@ -1,4 +1,3 @@
-import web_tools
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -36,19 +35,42 @@ def get_url(artist, song):
     
     raise Exception("Song not found in Search Result")
 
+def handle_element(element):
+    if isinstance(element, str):
+        return element
+    elif element.name == "br":
+        return '\n'
+    else:
+        return ""
+
 def extract_lyrics(html_doc):
     soup = BeautifulSoup(html_doc, 'html.parser')
-    div = soup.find('div', {'class': 'lyrics'})
+    lyric_container = soup.find('div', {'data-lyrics-container': 'true'})
+    if lyric_container is None:
+        raise Exception("Song didn't have lyrics in Genius")
 
-    return div.get_text().strip()
+    direct_children = lyric_container.children
+    next(direct_children) # Discard first child
+    first_element = next(direct_children)
+    elements = first_element.next_elements
+
+    lyrics = handle_element(first_element)
+    for element in elements:
+        if element.name == "div":
+            break
+        lyrics += handle_element(element)
+
+
+    return lyrics
     
 def get_lyrics(song_details):
     artist = song_details['artist']
     song = song_details['title']
 
     song_url = get_url(artist, song)
-    html_doc = web_tools.get_webpage(song_url)
+    html_response = requests.get(song_url)
+    # html_doc = web_tools.get_webpage(song_url)
 
-    lyrics = extract_lyrics(html_doc)
+    lyrics = extract_lyrics(html_response.text)
 
     return lyrics

@@ -24,6 +24,15 @@ def get_artist_from_search(response):
 def get_url_from_search(response):
     return response['result']['url']
 
+def does_song_match(artist, title, song):
+    artist = artist.lower()
+    title = title.lower()
+
+    possible_title = song['title'].lower()
+    primary_artist = song['primary_artist']['name'].lower()
+
+    return title == possible_title and primary_artist == artist
+
 def get_url(artist, song):
     query = search_string(artist, song)
     result = search_genius(query)
@@ -34,7 +43,7 @@ def get_url(artist, song):
         raise Exception("No response from Genius API")
 
     for response in responses:
-        if get_song_from_search(response) == song.lower() and get_artist_from_search(response) == artist.lower():
+        if does_song_match(artist, song, response['result']):
             return get_url_from_search(response)
     
     raise Exception("Song not found in Search for '"+query+"'")

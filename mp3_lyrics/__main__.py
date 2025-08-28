@@ -49,7 +49,13 @@ for mp3_file in alive_it(mp3_files):
         # print(mp3_file + " already has lyrics... Skipping.")
         continue
 
-    band_name, song_name = id3_tools.get_song_details(mp3_file)
+    try:
+        band_name, song_name = id3_tools.get_song_details(mp3_file)
+    except Exception as e:
+        # Error while fetching information.
+        print("Unable to get song or band name for " + mp3_file)
+        print("\t" + str(e))
+        continue
 
     try:
         lyrics, url = genius.get_lyrics({"artist":band_name, "title":song_name})

@@ -71,31 +71,34 @@ def get_url(artists, song):
     
     raise Exception("Song not found in Search for '"+query+"'")
 
+def handle_elements(elements):
+    lyrics = ""
+    for element in elements:
+        lyrics += handle_element(element)
+    return lyrics
+
 def handle_element(element):
     if isinstance(element, str):
         return element
-    elif element.name == "br":
-        return '\n'
-    else:
-        return ""
+    
+    match element.name:
+        case "br":
+            return "\n"
+        # I don't know all the formatting elements it might use. I've only seen i,a, and span
+        case "i" | "b" | "a" | "p" | "span":
+            return handle_elements(element.children)
+        case _:
+            return ""
 
 def extract_lyrics(html_doc):
     soup = BeautifulSoup(html_doc, 'html.parser')
-    lyric_container = soup.find('div', {'data-lyrics-container': 'true'})
-    if lyric_container is None:
+    lyric_container_array = soup.find_all('div', {'data-lyrics-container': 'true'})
+    if len(lyric_container_array) == 0:
         raise Exception("Song didn't have lyrics in Genius")
 
-    direct_children = lyric_container.children
-    next(direct_children) # Discard first child
-    first_element = next(direct_children)
-    elements = first_element.next_elements
-
-    lyrics = handle_element(first_element)
-    for element in elements:
-        if element.name == "div":
-            break
-        lyrics += handle_element(element)
-
+    lyrics = ""
+    for lyric_container in lyric_container_array:
+        lyrics += handle_elements(lyric_container.children)
 
     return lyrics
     

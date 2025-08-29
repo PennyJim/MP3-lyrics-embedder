@@ -114,3 +114,27 @@ def get_lyrics(song_details):
     lyrics = extract_lyrics(html_response.text)
 
     return lyrics, song_url
+
+
+def main():
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    # parser.add_argument("-i", "--input", dest="inputfile",
+    #                     help="The file to fetch the lyrics for", metavar="FILE")
+    parser.add_argument("-t", "--title", dest="title", required=True,
+                        help="The name of the song to fetch lyrics for", metavar="STRING")
+    parser.add_argument("-a", "--artist", dest="artist", required=True,
+                        help="The name of the artist of the song to fetch lyrics for", metavar="STRING")
+    args = parser.parse_args()
+    
+    # if args.inputfile == None and (args.title == None or args.artist == None):
+    #     raise Exception("Need to either give a file or both a title and an artist")
+    # if args.inputfile and not args.inputfile.lower().endswith(".mp3"):
+    #     raise Exception("Given file is not a mp3")
+    
+    lyrics, url = get_lyrics({"artist": args.artist, "title": args.title})
+    print(lyrics)
+    
+
+if __name__ == "__main__":
+    main()
